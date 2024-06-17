@@ -1,6 +1,18 @@
 # M2354BSP_ADC_polling
  M2354BSP_ADC_polling
 
+update @ 2024/06/17
+
+1. 1.use ADC CH8 (PB.8) , ADC CH10 (PB.10) to get different adc channel value 
+
+2. below is log capture 
+
+
+![image](https://github.com/released/M2354BSP_ADC_polling/blob/main/log2.jpg)
+
+
+![image](https://github.com/released/M2354BSP_ADC_polling/blob/main/log3.jpg)
+
 
 udpate @ 2024/04/15
 

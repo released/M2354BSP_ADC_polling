@@ -169,6 +169,7 @@ uint16_t get_ADC_Channel(uint8_t ch)
     EADC_Open(EADC, EADC_CTL_DIFFEN_SINGLE_END);
 
     EADC_ConfigSampleModule(EADC, module_num, EADC_ADINT0_TRIGGER , ch);
+    EADC_SetExtendSampleTime(EADC, module_num, 0xFF);
 
     #if !defined (USE_ADC_POLLING)
     /* Clear the A/D ADINT0 interrupt flag for safe */
@@ -196,7 +197,7 @@ uint16_t get_ADC_Channel(uint8_t ch)
 
     val = EADC_GET_CONV_DATA(EADC, module_num);
 
-    printf("0X%4X:adc voltage is %dmV if Reference voltage is %4d mv\n", val ,(u32AVDDVoltage*val)/4095 , u32AVDDVoltage);
+    // printf("0X%4X:adc voltage is %dmV if Reference voltage is %4d mv\n", val ,(u32AVDDVoltage*val)/4095 , u32AVDDVoltage);
 
     #if !defined (USE_ADC_POLLING)
     EADC_DISABLE_SAMPLE_MODULE_INT(EADC, 0, module_mask);
@@ -438,6 +439,7 @@ void loop(void)
 {
 	static uint32_t LOG1 = 0;
 	// static uint32_t LOG2 = 0;
+    uint16_t val = 0;
 
     if ((get_systick() % 1000) == 0)
     {
@@ -456,8 +458,16 @@ void loop(void)
     if (FLAG_PROJ_TIMER_PERIOD_SPECIFIC)
     {
         FLAG_PROJ_TIMER_PERIOD_SPECIFIC = 0;
-        get_ADC_Channel(8);
+
+        printf("Reference voltage is %4dmv,", u32AVDDVoltage);
+
+        val = get_ADC_Channel(8);
+        printf(">0X%04X:adc voltage is %4dmV,", val ,(u32AVDDVoltage*val)/4095);
+
+        val = get_ADC_Channel(10);
+        printf(">0X%04X:adc voltage is %4dmV,", val ,(u32AVDDVoltage*val)/4095);
     
+        printf("\r\n");
     }
 }
 
@@ -593,8 +603,9 @@ void SYS_Init(void)
 
     // Set multi-function pins for EADC channels. //
     SYS->GPB_MFPH = (SYS->GPB_MFPH & ~(SYS_GPB_MFPH_PB8MFP_Msk)) | EADC0_CH8_PB8;
+    SYS->GPB_MFPH = (SYS->GPB_MFPH & ~(SYS_GPB_MFPH_PB10MFP_Msk)) | EADC0_CH10_PB10;
 
-    GPIO_DISABLE_DIGITAL_PATH(PB, BIT8);
+    GPIO_DISABLE_DIGITAL_PATH(PB, BIT8 | BIT10);
 
     /* Update System Core Clock */
     /* User can use SystemCoreClockUpdate() to calculate SystemCoreClock. */
